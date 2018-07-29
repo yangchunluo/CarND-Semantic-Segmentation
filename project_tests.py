@@ -28,7 +28,7 @@ def _prevent_print(func, params):
 
 
 def _assert_tensor_shape(tensor, shape, display_name):
-    assert tf.assert_rank(tensor, len(shape), message='{} has wrong rank'.format(display_name))
+    tf.assert_rank(tensor, len(shape), message='{} has wrong rank'.format(display_name))
 
     tensor_shape = tensor.get_shape().as_list() if len(shape) else []
 
@@ -67,7 +67,6 @@ def test_load_vgg(load_vgg, tf_module):
         test_vgg_layer7_out = tf.placeholder(tf.float32, name='layer7_out')
 
         input_image, keep_prob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out = load_vgg(sess, vgg_path)
-        print(input_image)
 
         assert mock_load_model.called, \
             'tf.saved_model.loader.load() not called'
@@ -99,7 +98,7 @@ def test_optimize(optimize):
     layers_output = tf.Variable(tf.zeros(shape))
     correct_label = tf.placeholder(tf.float32, [None, None, None, num_classes])
     learning_rate = tf.placeholder(tf.float32)
-    logits, train_op, cross_entropy_loss = optimize(layers_output, correct_label, learning_rate, num_classes)
+    logits, train_op, cross_entropy_loss, _ = optimize(layers_output, correct_label, learning_rate, num_classes)
 
     _assert_tensor_shape(logits, [2*3*4, num_classes], 'Logits')
 
@@ -116,8 +115,8 @@ def test_train_nn(train_nn):
     epochs = 1
     batch_size = 2
 
-    def get_batches_fn(batach_size_parm):
-        shape = [batach_size_parm, 2, 3, 3]
+    def get_batches_fn(batch_size_parm):
+        shape = [batch_size_parm, 2, 3, 3]
         return np.arange(np.prod(shape)).reshape(shape)
 
     train_op = tf.constant(0)
