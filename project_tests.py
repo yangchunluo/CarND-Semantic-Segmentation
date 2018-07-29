@@ -1,7 +1,7 @@
-import sys
-import os
 from copy import deepcopy
 from glob import glob
+import os
+import sys
 from unittest import mock
 
 import numpy as np
@@ -21,9 +21,9 @@ def test_safe(func):
     return func_wrapper
 
 
-def _prevent_print(function, params):
+def _prevent_print(func, params):
     sys.stdout = open(os.devnull, "w")
-    function(**params)
+    func(**params)
     sys.stdout = sys.__stdout__
 
 
@@ -67,6 +67,7 @@ def test_load_vgg(load_vgg, tf_module):
         test_vgg_layer7_out = tf.placeholder(tf.float32, name='layer7_out')
 
         input_image, keep_prob, vgg_layer3_out, vgg_layer4_out, vgg_layer7_out = load_vgg(sess, vgg_path)
+        print(input_image)
 
         assert mock_load_model.called, \
             'tf.saved_model.loader.load() not called'

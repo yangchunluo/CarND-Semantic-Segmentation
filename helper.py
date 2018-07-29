@@ -1,15 +1,16 @@
+from glob import glob
+import os.path
 import re
 import random
-import numpy as np
-import os.path
-import scipy.misc
 import shutil
-import zipfile
 import time
+
+import numpy as np
+import scipy.misc
 import tensorflow as tf
-from glob import glob
-from urllib.request import urlretrieve
 from tqdm import tqdm
+from urllib.request import urlretrieve
+import zipfile
 
 
 class DLProgress(tqdm):
