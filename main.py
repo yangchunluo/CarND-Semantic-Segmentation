@@ -77,20 +77,21 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     layer7_1x1 = tf.layers.conv2d(
         vgg_layer7_out, num_classes, 1, 1,
         kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
+        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),
         activation=tf.nn.relu)
 
     # Layer 7: upsample and batch normalize.
     layer7_upsampled = tf.layers.conv2d_transpose(
-        layer7_1x1, num_classes, 3, 2, padding='same',
+        layer7_1x1, num_classes, 4, 2, padding='same',
         kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
-        activation=tf.nn.relu)
+        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     layer7_upsampled = tf.layers.batch_normalization(layer7_upsampled)
 
     # Layer 4: 1 by 1 convolution and batch normalize.
     layer4_1x1 = tf.layers.conv2d(
         vgg_layer4_out, num_classes, 1, 1,
         kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
-        activation=tf.nn.relu)
+        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     layer4_1x1 = tf.layers.batch_normalization(layer4_1x1)
 
     # Layer 4_7: combine.
@@ -98,16 +99,16 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     # Layer 4_7: upsample and batch normalize.
     layer_4_7_upsampled = tf.layers.conv2d_transpose(
-        layer_4_7, num_classes, 3, 2, padding='same',
+        layer_4_7, num_classes, 4, 2, padding='same',
         kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
-        activation=tf.nn.relu)
+        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     layer_4_7_upsampled = tf.layers.batch_normalization(layer_4_7_upsampled)
 
     # Layer 3: 1 by 1 convolution and batch normalize.
     layer3_1x1 = tf.layers.conv2d(
         vgg_layer3_out, num_classes, 1, 1,
         kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
-        activation=tf.nn.relu)
+        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3),)
     layer3_1x1 = tf.layers.batch_normalization(layer3_1x1)
 
     # Layer 3_4_7: combine.
@@ -116,7 +117,8 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     # Layer 3_4_7: sample.
     return tf.layers.conv2d_transpose(
         layer_3_4_7, num_classes, 16, 8, padding='same',
-        kernel_initializer=tf.truncated_normal_initializer(stddev=0.01))
+        kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
+        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
 
 tests.test_layers(layers)
@@ -214,7 +216,7 @@ def run():
         # Train NN using the train_nn function.
         logger.info('Starting training')
         sess.run(tf.global_variables_initializer())
-        train_nn(sess, epochs=6, batch_size=8,
+        train_nn(sess, epochs=20, batch_size=8,
                  keep_prob=keep_prob,
                  get_batches_fn=get_batches_fn,
                  train_op=train_op,
